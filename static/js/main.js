@@ -3,7 +3,7 @@
  * Global utilities: alerts, helpers, active nav link.
  */
 
-// ---- Active nav link highlight ----
+// ---- Active nav link highlight + Hamburger menu ----
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
     document.querySelectorAll('.navbar-links a').forEach(link => {
@@ -21,7 +21,38 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = `${y}-${m}`;
         }
     });
+
+    // ---- Hamburger menu (mobile) ----
+    // Dynamically inject a hamburger button into every navbar
+    const navbar = document.querySelector('.navbar');
+    const navLinks = document.querySelector('.navbar-links');
+
+    if (navbar && navLinks) {
+        // Create hamburger button
+        const burger = document.createElement('button');
+        burger.className = 'nav-hamburger';
+        burger.setAttribute('aria-label', 'Toggle navigation menu');
+        burger.innerHTML = '<span></span><span></span><span></span>';
+
+        // Insert between brand and links
+        navbar.insertBefore(burger, navLinks);
+
+        // Toggle open/close
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('open');
+            navLinks.classList.toggle('mobile-open');
+        });
+
+        // Close menu when a nav link is clicked
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                burger.classList.remove('open');
+                navLinks.classList.remove('mobile-open');
+            });
+        });
+    }
 });
+
 
 // ---- Alert helpers ----
 
