@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — EcoTrack</title>
+  <meta name="description"
+    content="View your carbon footprint trends, monthly comparison, recommendations, goals, and ML predictions." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.7rem;
+      padding: 0.3rem;
+      width: fit-content;
+      margin-bottom: 1.5rem;
+    }
+    .mode-toggle-btn {
+      padding: 0.45rem 1.1rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .mode-toggle-btn.active {
+      background: var(--accent);
+      color: #000;
+    }
+    /* Industry-only sections hidden by default */
+    .industry-only { display: none; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="navbar-brand" href="/"><div class="brand-icon">🌿</div>Eco<span>Track</span></a>
+    <ul class="navbar-links">
+      <li><a href="/">🏠 Home</a></li>
+      <li><a href="/calculator">🧮 Calculator</a></li>
+      <li><a href="/dashboard" class="active">📊 Dashboard</a></li>
+      <li><a href="/history">📋 History</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <h1>📊 Dashboard</h1>
+      <p>Your carbon footprint overview, trends, and AI-powered insights.</p>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <!-- MODE TOGGLE -->
+    <div class="mode-toggle">
+      <button class="mode-toggle-btn" id="dash-btn-individual"
+              onclick="switchDashMode('individual')">🏠 Individual</button>
+      <button class="mode-toggle-btn" id="dash-btn-industry"
+              onclick="switchDashMode('industry')">🏭 Industry</button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label" id="stat-current-label">This Month</div>
+        <div class="stat-value" id="stat-current">—</div>
+        <div class="stat-unit">kg CO₂e</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last Month</div>
+        <div class="stat-value" id="stat-previous">—</div>
+        <div class="stat-unit">kg CO₂e</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Monthly Change</div>
+        <div class="stat-value" id="stat-change">—</div>
+        <div class="stat-unit" id="stat-change-pct"></div>
+        <div class="stat-change" id="stat-change-label"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">ML Prediction (Next Month)</div>
+        <div class="stat-value" id="stat-prediction">—</div>
+        <div class="stat-unit" id="stat-prediction-note">kg CO₂e</div>
+      </div>
+    </div>
+
+    <!-- Industry-only extra stats -->
+    <div class="stat-grid industry-only" id="industry-stats-row" style="margin-top:-0.5rem;">
+      <div class="stat-card">
+        <div class="stat-label">Daily Average</div>
+        <div class="stat-value" id="stat-daily-avg">—</div>
+        <div class="stat-unit">kg CO₂e / day</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Days Recorded</div>
+        <div class="stat-value" id="stat-days">—</div>
+        <div class="stat-unit">this month</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:1rem; margin-bottom:1rem;">
+
+      <!-- MONTHLY TREND LINE CHART -->
+      <div class="card">
+        <div class="card-title"><span class="icon">📈</span>
+          <span id="trend-chart-title">Monthly Footprint Trend</span>
+        </div>
+        <canvas id="trend-chart" height="220"></canvas>
+        <div class="empty-state" id="trend-empty" style="display:none;">
+          <div class="empty-icon">📈</div>
+          <h3>No history yet</h3>
+          <p>Add at least 1 month of data to see trends.</p>
+        </div>
+      </div>
+
+      <!-- DONUT CHART -->
+      <div class="card">
+        <div class="card-title"><span class="icon">🥧</span> Category Breakdown</div>
+        <canvas id="donut-chart" height="220"></canvas>
+        <div class="empty-state" id="donut-empty" style="display:none;">
+          <div class="empty-icon">🥧</div>
+          <h3>No data yet</h3>
+          <p>Calculate your footprint first.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- INDUSTRY DAILY TREND CHART -->
+    <div class="card industry-only" id="daily-trend-card" style="margin-bottom:1rem;">
+      <div class="card-title"><span class="icon">📅</span> Daily Trend — This Month</div>
+      <canvas id="daily-trend-chart" height="160"></canvas>
+      <div class="empty-state" id="daily-trend-empty" style="display:none;">
+        <div class="empty-icon">📅</div>
+        <h3>No daily data yet</h3>
+        <p>Add daily entries for this month to see the trend.</p>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS + GOALS ROW -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+
+      <!-- RECOMMENDATIONS -->
+      <div class="card">
+        <div class="card-title"><span class="icon">💡</span> Personalized Recommendations</div>
+        <div id="recommendations-container">
+          <div class="empty-state">
+            <div class="empty-icon">💡</div>
+            <h3>Loading recommendations…</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOALS -->
+      <div class="card">
+        <div class="card-title"><span class="icon">🎯</span> Monthly Goal</div>
+        <div id="goal-container">
+
+          <div id="goal-form-section">
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label for="goal-month">Month</label>
+              <input type="month" id="goal-month" />
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label for="goal-target">Target CO₂e (kg)</label>
+              <input type="number" id="goal-target" min="0" step="1" placeholder="e.g. 200" />
+            </div>
+            <button class="btn btn-primary btn-sm" id="set-goal-btn">🎯 Set Goal</button>
+          </div>
+
+          <div id="goal-progress-section" style="display:none; margin-top:1rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;
+                        color:var(--text-secondary); margin-bottom:0.4rem;">
+              <span>Current: <strong id="goal-current">—</strong> kg</span>
+              <span>Target: <strong id="goal-target-display">—</strong> kg</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="goal-progress-bar" style="width:0%"></div>
+            </div>
+            <p id="goal-status-text"
+               style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.5rem;"></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- WHAT-IF SIMULATOR -->
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-title"><span class="icon">🔬</span> What-If Carbon Reduction Simulator</div>
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.25rem;">
+        Simulate how activity changes would affect your footprint. Results are estimates using the same emission factors.
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="sim-transport-mode">Transport Mode</label>
+          <select id="sim-transport-mode">
+            <option value="petrol_car">🚗 Petrol Car</option>
+            <option value="diesel_car">🚙 Diesel Car / Truck</option>
+            <option value="motorcycle">🏍️ Motorcycle</option>
+            <option value="bus">🚌 Bus</option>
+            <option value="auto_rickshaw">🛺 Auto Rickshaw</option>
+            <option value="metro_rail">🚇 Metro / Rail</option>
+            <option value="electric_car">⚡ Electric Car</option>
+            <option value="bicycle">🚲 Bicycle</option>
+            <option value="walking">🚶 Walking</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sim-distance">Distance (km)</label>
+          <input type="number" id="sim-distance" min="0" step="1" placeholder="e.g. 500" />
+        </div>
+        <div class="form-group">
+          <label for="sim-electricity">Electricity (kWh)</label>
+          <input type="number" id="sim-electricity" min="0" step="1" placeholder="e.g. 150" />
+        </div>
+        <div class="form-group">
+          <label for="sim-lpg">LPG Cylinders</label>
+          <input type="number" id="sim-lpg" min="0" step="0.1" placeholder="e.g. 1" />
+        </div>
+        <div class="form-group">
+          <label for="sim-waste">Waste (kg)</label>
+          <input type="number" id="sim-waste" min="0" step="1" placeholder="e.g. 30" />
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="simulate-btn" style="margin-top:1rem;">
+        🔬 Run Simulation
+      </button>
+
+      <div id="sim-result" style="display:none; margin-top:1.25rem; padding:1.25rem;
+           background:var(--accent-glow); border:1px solid var(--border-accent);
+           border-radius:var(--radius-md);">
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; text-align:center;">
+          <div>
+            <div style="font-size:1.6rem; font-weight:800; color:var(--text-secondary);"
+                 id="sim-original">—</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Current Footprint</div>
+          </div>
+          <div>
+            <div style="font-size:1.6rem; font-weight:800; color:var(--accent-light);"
+                 id="sim-projected">—</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Projected Footprint</div>
+          </div>
+          <div>
+            <div style="font-size:1.6rem; font-weight:800; color:#4ade80;"
+                 id="sim-saving">—</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Potential Saving</div>
+          </div>
+        </div>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.75rem; text-align:center;">
+          Simulation uses the same documented emission factors as the main calculator. Results are estimates.
+        </p>
+      </div>
+    </div>
+
+    <!-- ML PREDICTION CARD -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🤖</span> ML Prediction — Next Month's Footprint</div>
+      <div id="ml-prediction-container">
+        <div class="empty-state">
+          <div class="empty-icon">🤖</div>
+          <h3>Loading prediction…</h3>
+          <p>At least 3 months of historical data is required.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end page-container -->
+
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/simulator.js"></script>
+</body>
+</html>

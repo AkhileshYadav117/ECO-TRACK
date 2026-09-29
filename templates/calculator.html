@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carbon Calculator — EcoTrack</title>
+  <meta name="description"
+    content="Calculate your carbon footprint. Individual monthly mode or Industry daily mode." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    /* ---- Mode Selection Cards ---- */
+    .mode-select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .mode-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem 1.5rem;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      user-select: none;
+    }
+    .mode-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .mode-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.18);
+      background: linear-gradient(135deg, rgba(34,197,94,0.07) 0%, var(--card-bg) 100%);
+    }
+    .mode-card-icon {
+      font-size: 2.8rem;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+    .mode-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.3rem;
+    }
+    .mode-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .mode-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      margin-top: 0.5rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .badge-individual { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-industry   { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+    /* ---- Form Panels ---- */
+    .calc-form-panel { display: none; }
+    .calc-form-panel.visible { display: block; }
+
+    .mode-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+      padding: 0.5rem 0.9rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      width: fit-content;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <a class="navbar-brand" href="/"><div class="brand-icon">🌿</div>Eco<span>Track</span></a>
+    <ul class="navbar-links">
+      <li><a href="/">🏠 Home</a></li>
+      <li><a href="/calculator" class="active">🧮 Calculator</a></li>
+      <li><a href="/dashboard">📊 Dashboard</a></li>
+      <li><a href="/history">📋 History</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <h1>🧮 Carbon Footprint Calculator</h1>
+      <p>Select your profile type to get the most accurate carbon footprint estimate.</p>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <!-- ============================================================
+         STEP 1 — MODE SELECTION
+    ============================================================ -->
+    <div class="card">
+      <div class="card-title"><span class="icon">👤</span> Step 1 — Select Your Profile</div>
+
+      <div class="mode-select-grid">
+
+        <!-- Individual Card -->
+        <div class="mode-card" id="mode-individual" onclick="selectMode('individual')">
+          <span class="mode-card-icon">🏠</span>
+          <div class="mode-card-title">Individual / Household</div>
+          <div class="mode-card-subtitle">
+            Enter your monthly electricity bill, LPG usage, travel, and waste.
+            Best for personal and home use.
+          </div>
+          <span class="mode-badge badge-individual">Monthly Input</span>
+        </div>
+
+        <!-- Industry Card -->
+        <div class="mode-card" id="mode-industry" onclick="selectMode('industry')">
+          <span class="mode-card-icon">🏭</span>
+          <div class="mode-card-title">Industry / Factory</div>
+          <div class="mode-card-subtitle">
+            Enter daily electricity, fuel, transport, and waste.
+            Records accumulate into monthly totals.
+          </div>
+          <span class="mode-badge badge-industry">Daily Input</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================
+         STEP 2a — INDIVIDUAL / HOUSEHOLD FORM (monthly inputs)
+    ============================================================ -->
+    <div class="card calc-form-panel" id="panel-individual">
+
+      <div class="mode-indicator">🏠 Individual / Household &nbsp;·&nbsp; Monthly Activity Entry</div>
+      <div class="card-title"><span class="icon">📅</span> Step 2 — Monthly Activity Data</div>
+
+      <form id="form-individual" novalidate>
+        <input type="hidden" id="ind-user-type" value="individual" />
+
+        <!-- Month -->
+        <div class="form-section">
+          <div class="form-section-title">📅 Billing Month</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-month">Month</label>
+              <input type="month" id="ind-month" name="month" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Select the month for which you are entering data (e.g. electricity bill month).
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport -->
+        <div class="form-section">
+          <div class="form-section-title">🚗 Transportation (this month)</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-transport-mode">Primary Transport Mode</label>
+              <select id="ind-transport-mode" name="transport_mode" required>
+                <option value="">— Select mode —</option>
+                <option value="petrol_car">🚗 Petrol Car</option>
+                <option value="diesel_car">🚙 Diesel Car</option>
+                <option value="motorcycle">🏍️ Motorcycle</option>
+                <option value="bus">🚌 Bus</option>
+                <option value="auto_rickshaw">🛺 Auto Rickshaw</option>
+                <option value="metro_rail">🚇 Metro / Rail</option>
+                <option value="electric_car">⚡ Electric Car</option>
+                <option value="bicycle">🚲 Bicycle</option>
+                <option value="walking">🚶 Walking</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ind-distance">Total Distance This Month (km)</label>
+              <input type="number" id="ind-distance" min="0" max="10000"
+                step="1" placeholder="e.g. 500" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Total km travelled this month by the selected mode.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Energy -->
+        <div class="form-section">
+          <div class="form-section-title">⚡ Energy (this month)</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-electricity">Monthly Electricity (kWh)</label>
+              <input type="number" id="ind-electricity" min="0" max="5000"
+                step="0.1" placeholder="e.g. 150" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Units from your electricity bill (kWh).
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="ind-lpg">LPG Cylinders Used This Month</label>
+              <input type="number" id="ind-lpg" min="0" max="10"
+                step="0.1" placeholder="e.g. 1" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Number of standard 14.2 kg cylinders used this month.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waste -->
+        <div class="form-section">
+          <div class="form-section-title">🗑️ Waste (this month)</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-waste">Total Waste Generated (kg)</label>
+              <input type="number" id="ind-waste" min="0" max="500"
+                step="0.5" placeholder="e.g. 30" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Estimated kg of mixed household waste sent to landfill this month.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:1rem; align-items:center; margin-top:1.5rem; flex-wrap:wrap;">
+          <button type="submit" class="btn btn-primary" id="ind-calc-btn">
+            🏠 Calculate Monthly Footprint
+          </button>
+          <div class="spinner" id="ind-spinner"></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ============================================================
+         STEP 2b — INDUSTRY / FACTORY FORM (daily inputs)
+    ============================================================ -->
+    <div class="card calc-form-panel" id="panel-industry">
+
+      <div class="mode-indicator">🏭 Industry / Factory &nbsp;·&nbsp; Daily Activity Entry</div>
+      <div class="card-title"><span class="icon">📅</span> Step 2 — Daily Activity Data</div>
+
+      <form id="form-industry" novalidate>
+        <input type="hidden" id="ind-user-type-industry" value="industry" />
+
+        <!-- Date -->
+        <div class="form-section">
+          <div class="form-section-title">📅 Activity Date</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-date">Date</label>
+              <input type="date" id="ind-date" name="date" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Date for which you are entering today's activity data.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport -->
+        <div class="form-section">
+          <div class="form-section-title">🚗 Transportation / Logistics (today)</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-transport-mode-industry">Transport / Logistics Mode</label>
+              <select id="ind-transport-mode-industry" name="transport_mode" required>
+                <option value="">— Select mode —</option>
+                <option value="petrol_car">🚗 Petrol Vehicle</option>
+                <option value="diesel_car">🚙 Diesel Vehicle / Truck</option>
+                <option value="motorcycle">🏍️ Motorcycle / Scooter</option>
+                <option value="bus">🚌 Bus / Staff Transport</option>
+                <option value="auto_rickshaw">🛺 Three-Wheeler</option>
+                <option value="metro_rail">🚇 Rail / Metro</option>
+                <option value="electric_car">⚡ Electric Vehicle</option>
+                <option value="bicycle">🚲 Bicycle / Non-motorized</option>
+                <option value="walking">🚶 Walking</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ind-distance-industry">Total Distance Today (km)</label>
+              <input type="number" id="ind-distance-industry" min="0" max="10000"
+                step="0.1" placeholder="e.g. 200" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Total km of transport / logistics activity today.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Energy -->
+        <div class="form-section">
+          <div class="form-section-title">⚡ Energy (today)</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-electricity-industry">Electricity Consumed Today (kWh)</label>
+              <input type="number" id="ind-electricity-industry" min="0" max="100000"
+                step="1" placeholder="e.g. 500" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                From meter reading, energy monitoring system, or shift log.
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="ind-lpg-industry">LPG / Fuel Used Today (cylinders)</label>
+              <input type="number" id="ind-lpg-industry" min="0" max="100"
+                step="0.01" placeholder="e.g. 2" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Number of standard 14.2 kg cylinders consumed today.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waste -->
+        <div class="form-section">
+          <div class="form-section-title">🗑️ Waste (today)</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="ind-waste-industry">Waste Generated Today (kg)</label>
+              <input type="number" id="ind-waste-industry" min="0" max="50000"
+                step="0.5" placeholder="e.g. 120" required />
+              <small style="color:var(--text-muted); font-size:0.75rem;">
+                Total mixed industrial / municipal waste sent to landfill today.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:1rem; align-items:center; margin-top:1.5rem; flex-wrap:wrap;">
+          <button type="submit" class="btn btn-primary" id="ind-calc-btn-industry">
+            🏭 Calculate Daily Footprint
+          </button>
+          <div class="spinner" id="ind-spinner-industry"></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ============================================================
+         RESULT PANEL (shared by both modes)
+    ============================================================ -->
+    <div id="result-panel" class="result-panel" style="display:none;">
+
+      <div class="result-header">
+        <div class="result-icon" id="result-icon">🌿</div>
+        <div>
+          <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.25rem;"
+               id="result-period-label">Carbon Footprint</div>
+          <div class="result-total">
+            <span id="result-total-value">—</span>
+            <span class="result-unit">kg CO₂e</span>
+          </div>
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.25rem;"
+               id="result-date-label"></div>
+        </div>
+      </div>
+
+      <div class="breakdown-grid">
+        <div class="breakdown-item">
+          <div class="breakdown-icon">🚗</div>
+          <div class="breakdown-label">Transport</div>
+          <div class="breakdown-value"><span id="r-transport">—</span> kg</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-icon">⚡</div>
+          <div class="breakdown-label">Electricity</div>
+          <div class="breakdown-value"><span id="r-electricity">—</span> kg</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-icon">🔥</div>
+          <div class="breakdown-label">Fuel (LPG)</div>
+          <div class="breakdown-value"><span id="r-fuel">—</span> kg</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-icon">🗑️</div>
+          <div class="breakdown-label">Waste</div>
+          <div class="breakdown-value"><span id="r-waste">—</span> kg</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-top:1rem;">
+        <span style="font-size:0.85rem; color:var(--text-secondary);">Data Quality:</span>
+        <span id="quality-badge" class="quality-badge quality-medium">Medium</span>
+      </div>
+
+      <div id="quality-notes-container"></div>
+
+      <div id="anomaly-warning" class="alert alert-warning" style="display:none; margin-top:1rem;">
+        ⚠️ <span id="anomaly-message"></span>
+      </div>
+
+      <div class="alert alert-info" style="margin-top:1rem;" id="result-saved-msg">
+        ✅ Saved to your history. Visit the
+        <a href="/dashboard" style="color:var(--accent);">Dashboard</a>
+        to see your monthly aggregated footprint.
+      </div>
+
+    </div>
+
+    <!-- EMISSION FACTORS REFERENCE -->
+    <div class="card" style="margin-top:1rem;">
+      <div class="card-title"><span class="icon">📊</span> Emission Factors Reference</div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">
+        All calculations use documented emission factors. Results are estimates — not direct measurements.
+      </p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Category</th><th>Factor</th><th>Unit</th><th>Source</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Petrol Car</td><td>0.210</td><td>kg CO₂e / km</td><td>DEFRA 2023</td></tr>
+            <tr><td>Diesel Car / Truck</td><td>0.170</td><td>kg CO₂e / km</td><td>DEFRA 2023</td></tr>
+            <tr><td>Motorcycle</td><td>0.110</td><td>kg CO₂e / km</td><td>DEFRA 2023</td></tr>
+            <tr><td>Bus</td><td>0.089</td><td>kg CO₂e / km</td><td>IPCC AR6</td></tr>
+            <tr><td>Auto Rickshaw</td><td>0.075</td><td>kg CO₂e / km</td><td>MoEFCC India</td></tr>
+            <tr><td>Metro / Rail</td><td>0.031</td><td>kg CO₂e / km</td><td>CEA India</td></tr>
+            <tr><td>Electric Vehicle</td><td>0.050</td><td>kg CO₂e / km</td><td>CEA India 2023</td></tr>
+            <tr><td>Bicycle / Walking</td><td>0.000</td><td>—</td><td>—</td></tr>
+            <tr><td>Electricity (India Grid)</td><td>0.716</td><td>kg CO₂e / kWh</td><td>CEA India 2023</td></tr>
+            <tr><td>LPG Cylinder (14.2 kg)</td><td>14.200</td><td>kg CO₂e / cylinder</td><td>IPCC AR6</td></tr>
+            <tr><td>Mixed Waste</td><td>0.450</td><td>kg CO₂e / kg</td><td>DEFRA 2023</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/calculator.js"></script>
+</body>
+</html>

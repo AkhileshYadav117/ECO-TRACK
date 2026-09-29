@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>History — EcoTrack</title>
+    <meta name="description" content="View and export your complete carbon footprint history." />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <style>
+      .mode-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0.7rem;
+        padding: 0.3rem;
+        width: fit-content;
+        margin-bottom: 1.5rem;
+      }
+      .mode-toggle-btn {
+        padding: 0.45rem 1.1rem;
+        border-radius: 0.5rem;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+      }
+      .mode-toggle-btn.active {
+        background: var(--accent);
+        color: #000;
+      }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="/">
+            <div class="brand-icon">🌿</div>Eco<span>Track</span>
+        </a>
+        <ul class="navbar-links">
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/calculator">🧮 Calculator</a></li>
+            <li><a href="/dashboard">📊 Dashboard</a></li>
+            <li><a href="/history" class="active">📋 History</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-container">
+
+        <div class="page-header"
+            style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+            <div>
+                <h1>📋 Footprint History</h1>
+                <p id="history-subtitle">All your recorded carbon footprint entries.</p>
+            </div>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <button class="btn btn-secondary btn-sm" id="export-csv-btn">⬇️ Export CSV</button>
+                <button class="btn btn-secondary btn-sm" id="export-monthly-btn">⬇️ Monthly Summary CSV</button>
+                <a href="/calculator" class="btn btn-primary btn-sm">+ New Entry</a>
+            </div>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <!-- MODE TOGGLE -->
+        <div class="mode-toggle">
+            <button class="mode-toggle-btn" id="hist-btn-individual"
+                    onclick="switchHistMode('individual')">🏠 Individual</button>
+            <button class="mode-toggle-btn" id="hist-btn-industry"
+                    onclick="switchHistMode('industry')">🏭 Industry</button>
+        </div>
+
+        <!-- ANOMALY INFO BANNER -->
+        <div class="alert alert-warning" style="margin-bottom:1rem;">
+            ⚠️ Entries flagged with <strong>⚠️ Anomaly</strong> have unusually high or low
+            values compared to recent history. Please verify those inputs.
+        </div>
+
+        <!-- HISTORY TABLE -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">📋</span>
+                <span id="table-title">Records</span>
+            </div>
+
+            <div id="history-container">
+                <div class="empty-state" id="history-empty">
+                    <div class="empty-icon">📋</div>
+                    <h3>No records yet</h3>
+                    <p>Go to the <a href="/calculator" style="color:var(--accent);">Calculator</a>
+                       to add your first entry.</p>
+                </div>
+
+                <div class="table-container" id="history-table-container" style="display:none;">
+                    <table id="history-table">
+                        <thead id="history-thead">
+                            <!-- Headers injected by JS based on mode -->
+                        </thead>
+                        <tbody id="history-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY STATS -->
+        <div class="card" style="margin-top:1rem;">
+            <div class="card-title"><span class="icon">📊</span>
+              <span id="summary-title">Historical Summary</span>
+            </div>
+            <div class="stat-grid" style="margin-bottom:0;">
+                <div class="stat-card">
+                    <div class="stat-label" id="count-label">Total Records</div>
+                    <div class="stat-value" id="hist-count">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" id="avg-label">Average per Period</div>
+                    <div class="stat-value" id="hist-avg">—</div>
+                    <div class="stat-unit">kg CO₂e</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" id="max-label">Highest</div>
+                    <div class="stat-value" id="hist-max">—</div>
+                    <div class="stat-unit">kg CO₂e</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" id="min-label">Lowest</div>
+                    <div class="stat-value" id="hist-min">—</div>
+                    <div class="stat-unit">kg CO₂e</div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end page-container -->
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/reports.js"></script>
+</body>
+</html>

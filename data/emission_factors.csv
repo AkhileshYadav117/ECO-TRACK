@@ -1,0 +1,19 @@
+id,category,activity,unit,factor,source,version,effective_date
+1,transport,petrol_car,km,0.21,DEFRA UK GHG Conversion Factors,2023,2023-01-01
+2,transport,diesel_car,km,0.17,DEFRA UK GHG Conversion Factors,2023,2023-01-01
+3,transport,motorcycle,km,0.11,DEFRA UK GHG Conversion Factors,2023,2023-01-01
+4,transport,bus,km,0.089,DEFRA UK GHG Conversion Factors,2023,2023-01-01
+5,transport,auto_rickshaw,km,0.075,MoEFCC India / ARAI estimate,2022,2022-01-01
+6,transport,metro_rail,km,0.031,CEA India / DMRC Environmental Report,2022,2022-01-01
+7,transport,bicycle,km,0.0,Zero emission - human powered,,
+8,transport,walking,km,0.0,Zero emission - human powered,,
+9,transport,electric_car,km,0.05,CEA India Grid + EV efficiency estimate,2023,2023-01-01
+10,electricity,grid_india,kWh,0.716,CEA CO2 Baseline Database India,2023,2023-01-01
+11,fuel,lpg_cooking,kg,2.983,IPCC AR5 / DEFRA LPG factor,2023,2023-01-01
+12,fuel,lpg_cylinder,cylinder,14.2,IPCC AR5 (14.2kg LPG per standard cylinder x 2.983),2023,2023-01-01
+13,fuel,natural_gas,cubic_meter,2.04,DEFRA UK GHG Conversion Factors,2023,2023-01-01
+14,fuel,wood_burning,kg,1.747,IPCC AR5 Biomass combustion factor,2013,2013-01-01
+15,waste,landfill_waste,kg,0.5,IPCC Waste Guidelines / MoEFCC India,2006,2006-01-01
+16,waste,recycled_waste,kg,0.021,DEFRA Waste Conversion Factors,2023,2023-01-01
+17,waste,composted_waste,kg,0.01,DEFRA Waste Conversion Factors,2023,2023-01-01
+18,waste,mixed_waste,kg,0.45,MoEFCC India waste sector estimate,2022,2022-01-01

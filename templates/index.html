@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoTrack — AI Carbon Footprint Monitor</title>
+    <meta name="description"
+        content="Track, analyze, and reduce your personal carbon footprint using AI-powered insights and environmental data." />
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="/">
+            <div class="brand-icon">🌿</div>
+            Eco<span>Track</span>
+        </a>
+        <ul class="navbar-links">
+            <li><a href="/" class="active">🏠 Home</a></li>
+            <li><a href="/calculator">🧮 Calculator</a></li>
+            <li><a href="/dashboard">📊 Dashboard</a></li>
+            <li><a href="/history">📋 History</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <main class="hero">
+        <div class="hero-badge">🌍 Environmental Science × AI/ML</div>
+
+        <h1>
+            Track Your<br />
+            <span class="highlight">Carbon Footprint</span><br />
+            with AI Precision
+        </h1>
+
+        <p>
+            EcoTrack estimates your monthly CO₂e emissions from transport,
+            electricity, fuel, and waste — then predicts your future footprint
+            using machine learning.
+        </p>
+
+        <div class="hero-actions">
+            <a href="/calculator" class="btn btn-primary btn-lg">
+                🧮 Calculate My Footprint
+            </a>
+            <a href="/dashboard" class="btn btn-secondary btn-lg">
+                📊 View Dashboard
+            </a>
+        </div>
+
+        <!-- FEATURE CARDS -->
+        <div class="feature-grid" style="max-width:1100px; width:100%;">
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <h3>Real-Time Calculation</h3>
+                <p>Instant CO₂e estimates using documented emission factors from DEFRA, CEA India, and IPCC.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🤖</div>
+                <h3>ML Prediction</h3>
+                <p>Scikit-learn regression predicts your next month's carbon footprint from historical trends.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎯</div>
+                <h3>Goal Tracking</h3>
+                <p>Set monthly CO₂e reduction targets and track your progress toward a greener lifestyle.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔬</div>
+                <h3>What-If Simulator</h3>
+                <p>Simulate the impact of reducing car trips, switching to metro, or using less electricity.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📈</div>
+                <h3>Monthly Comparison</h3>
+                <p>Compare this month vs last month with absolute and percentage change metrics.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✅</div>
+                <h3>Data Quality Score</h3>
+                <p>Every calculation comes with a transparency indicator showing input completeness.</p>
+            </div>
+        </div>
+
+        <!-- DISCLAIMER -->
+        <p style="margin-top:4rem; font-size:0.75rem; color:var(--text-muted); max-width:560px;">
+            ⚠️ All results are <strong>estimated carbon emissions</strong> based on documented emission factors.
+            They are not direct physical measurements of CO₂. Sources: DEFRA 2023, CEA India 2023, IPCC AR5, MoEFCC
+            India.
+        </p>
+    </main>
+
+    <script src="/static/js/main.js"></script>
+</body>
+
+</html>
