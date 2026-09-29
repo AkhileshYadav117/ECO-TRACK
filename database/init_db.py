@@ -117,6 +117,11 @@ def init_db():
     # Run schema migrations on existing databases
     migrate_db()
 
+    # Ensure the default demo user (user_id=1) always exists
+    # This is required on fresh deployments (e.g. Render) where the DB
+    # is created from scratch with no existing data.
+    seed_default_user()
+
     print("[OK] Database initialized successfully.")
     print(f"   Location: {DB_PATH}")
 
