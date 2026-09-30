@@ -909,4 +909,216 @@ tbody tr:hover {
 /* Hamburger hidden on desktop */
 .nav-hamburger {
     display: none;
-}
+}
+
+/* ============================================================
+   EMISSION FACTOR EXPLORER
+   ============================================================ */
+
+/* Methodology card */
+.ef-methodology .ef-formula-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+}
+
+.ef-formula-term {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-light);
+  background: rgba(34, 197, 94, 0.12);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+}
+
+.ef-formula-op {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.ef-formula-result {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.07);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+}
+
+.ef-method-note {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.ef-source-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-dark);
+}
+
+/* Expandable factor card */
+.ef-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.ef-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition);
+  flex-wrap: wrap;
+}
+
+.ef-toggle:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ef-toggle-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.ef-toggle-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.ef-toggle-factor {
+  flex: 1;
+  font-size: 0.83rem;
+  color: var(--accent-light);
+  font-weight: 600;
+}
+
+.ef-toggle-arrow {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+/* Accordion body — collapsed by default */
+.ef-body {
+  display: none;
+  padding: 0.25rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.ef-body.ef-body-open {
+  display: block;
+}
+
+/* Factor detail grid */
+.ef-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.ef-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+}
+
+.ef-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+.ef-value {
+  font-size: 0.87rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* Transport table */
+.ef-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.ef-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+  min-width: 520px;
+}
+
+.ef-table th {
+  text-align: left;
+  padding: 0.65rem 0.9rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.ef-table td {
+  padding: 0.6rem 0.9rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.ef-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ef-table tr:hover td {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ef-zero-row td {
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .ef-formula-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .ef-toggle-factor {
+    width: 100%;
+    margin-left: 2.1rem;
+  }
+
+  .ef-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
