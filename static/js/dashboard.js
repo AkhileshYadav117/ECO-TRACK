@@ -15,10 +15,10 @@
  * The mode toggle also stores back to localStorage.
  */
 
-let trendChart      = null;
-let donutChart      = null;
+let trendChart = null;
+let donutChart = null;
 let dailyTrendChart = null;
-let dashUserType    = localStorage.getItem('ecotrack_user_type') || 'individual';
+let dashUserType = localStorage.getItem('ecotrack_user_type') || 'individual';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Apply mode from localStorage (may also come from URL ?user_type=)
@@ -48,7 +48,7 @@ function switchDashMode(userType) {
 function applyModeUI(userType) {
   // Toggle buttons
   document.getElementById('dash-btn-individual').classList.toggle('active', userType === 'individual');
-  document.getElementById('dash-btn-industry').classList.toggle('active',   userType === 'industry');
+  document.getElementById('dash-btn-industry').classList.toggle('active', userType === 'industry');
 
   // Show/hide industry-only sections
   document.querySelectorAll('.industry-only').forEach(el => {
@@ -80,16 +80,16 @@ function loadAll(userType) {
 
 async function loadMonthlySummary(userType) {
   try {
-    const res  = await fetch(`/api/monthly-summary?user_type=${userType}`);
+    const res = await fetch(`/api/monthly-summary?user_type=${userType}`);
     const data = await res.json();
 
     const summaries = data.summaries || [];
-    const current   = data.current;
-    const previous  = data.previous;
-    const change    = data.change;
+    const current = data.current;
+    const previous = data.previous;
+    const change = data.change;
 
     // ---- Stat Cards ----
-    document.getElementById('stat-current').textContent  = current  ? fmt(current.total)  : '—';
+    document.getElementById('stat-current').textContent = current ? fmt(current.total) : '—';
     document.getElementById('stat-previous').textContent = previous ? fmt(previous.total) : '—';
 
     if (change && Object.keys(change).length > 0) {
@@ -97,7 +97,7 @@ async function loadMonthlySummary(userType) {
       const changeEl = document.getElementById('stat-change');
       if (changeEl) {
         changeEl.textContent = `${sign}${fmt(change.absolute)}`;
-        changeEl.className   = `stat-value ${change.direction}`;
+        changeEl.className = `stat-value ${change.direction}`;
       }
       const pctEl = document.getElementById('stat-change-pct');
       if (pctEl) pctEl.textContent = `${sign}${change.percent}% vs last month`;
@@ -114,9 +114,9 @@ async function loadMonthlySummary(userType) {
 
     // Industry extra stats
     if (userType === 'industry' && current) {
-      const avgEl  = document.getElementById('stat-daily-avg');
+      const avgEl = document.getElementById('stat-daily-avg');
       const daysEl = document.getElementById('stat-days');
-      if (avgEl)  avgEl.textContent  = current.daily_avg != null ? fmt(current.daily_avg) : '—';
+      if (avgEl) avgEl.textContent = current.daily_avg != null ? fmt(current.daily_avg) : '—';
       if (daysEl) daysEl.textContent = current.day_count || 0;
     }
 
@@ -131,10 +131,15 @@ async function loadMonthlySummary(userType) {
       document.getElementById('donut-empty').style.display = 'block';
     }
 
+    // --- Eco Score + Achievements (always run, even with no data) ---
+    renderEcoScore(summaries, current, previous, change);
+    renderBadges(summaries, current, previous, change);
+
   } catch (err) {
     console.error('Monthly summary error:', err);
   }
 }
+
 
 
 // ============================================================
@@ -160,8 +165,8 @@ function renderTrendChart(summaries, userType) {
       datasets: [{
         label: 'Monthly CO₂e (kg)',
         data: totals,
-        borderColor:          '#22c55e',
-        backgroundColor:      'rgba(34,197,94,0.08)',
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,0.08)',
         pointBackgroundColor: '#22c55e',
         pointRadius: 5,
         tension: 0.4,
@@ -197,10 +202,10 @@ function renderDonutChart(record) {
       labels: ['Transport', 'Electricity', 'Fuel', 'Waste'],
       datasets: [{
         data: [
-          parseFloat((record.transport   || 0).toFixed(1)),
+          parseFloat((record.transport || 0).toFixed(1)),
           parseFloat((record.electricity || 0).toFixed(1)),
-          parseFloat((record.fuel        || 0).toFixed(1)),
-          parseFloat((record.waste       || 0).toFixed(1)),
+          parseFloat((record.fuel || 0).toFixed(1)),
+          parseFloat((record.waste || 0).toFixed(1)),
         ],
         backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
         borderColor: 'rgba(0,0,0,0)',
@@ -228,7 +233,7 @@ function renderDonutChart(record) {
 
 async function loadDailyTrend() {
   try {
-    const res  = await fetch('/api/daily-summary');
+    const res = await fetch('/api/daily-summary');
     const data = await res.json();
     const records = data.records || [];
 
@@ -276,7 +281,7 @@ function renderDailyTrendChart(records) {
         x: { ticks: { color: '#64748b', maxTicksLimit: 15 }, grid: { color: 'rgba(255,255,255,0.03)' } },
         y: {
           ticks: { color: '#64748b' },
-          grid:  { color: 'rgba(255,255,255,0.05)' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
           title: { display: true, text: 'kg CO₂e (Daily)', color: '#64748b' }
         }
       }
@@ -294,7 +299,7 @@ async function loadRecommendations(userType) {
   if (!container) return;
 
   try {
-    const res  = await fetch(`/api/recommendations?user_type=${userType}`);
+    const res = await fetch(`/api/recommendations?user_type=${userType}`);
     const data = await res.json();
 
     if (!data.recommendations || data.recommendations.length === 0) {
@@ -332,12 +337,12 @@ async function loadRecommendations(userType) {
 
 async function loadMLPrediction(userType) {
   const container = document.getElementById('ml-prediction-container');
-  const statEl    = document.getElementById('stat-prediction');
-  const noteEl    = document.getElementById('stat-prediction-note');
+  const statEl = document.getElementById('stat-prediction');
+  const noteEl = document.getElementById('stat-prediction-note');
   if (!container) return;
 
   try {
-    const res  = await fetch(`/api/predict?user_type=${userType}`);
+    const res = await fetch(`/api/predict?user_type=${userType}`);
     const data = await res.json();
 
     if (data.status === 'insufficient_data') {
@@ -404,7 +409,7 @@ function setupGoalForm() {
   }
 
   btn.addEventListener('click', async () => {
-    const month  = document.getElementById('goal-month').value;
+    const month = document.getElementById('goal-month').value;
     const target = document.getElementById('goal-target').value;
 
     if (!month || !target || parseFloat(target) <= 0) {
@@ -413,11 +418,11 @@ function setupGoalForm() {
     }
 
     try {
-      const res  = await fetch(`/api/goals?user_type=${dashUserType}`, {
-        method:  'POST',
+      const res = await fetch(`/api/goals?user_type=${dashUserType}`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          user_type:   dashUserType,
+        body: JSON.stringify({
+          user_type: dashUserType,
           month,
           target_co2e: parseFloat(target)
         })
@@ -434,24 +439,24 @@ function setupGoalForm() {
 
 async function loadGoal(userType) {
   try {
-    const res  = await fetch(`/api/goals?user_type=${userType}`);
+    const res = await fetch(`/api/goals?user_type=${userType}`);
     const data = await res.json();
     if (!data.goal) return;
 
-    const goal    = data.goal;
+    const goal = data.goal;
     const current = data.current_footprint || 0;
-    const target  = goal.target_co2e;
-    const pct     = Math.min((current / target) * 100, 100).toFixed(0);
-    const days    = data.day_count || 0;
+    const target = goal.target_co2e;
+    const pct = Math.min((current / target) * 100, 100).toFixed(0);
+    const days = data.day_count || 0;
 
-    document.getElementById('goal-form-section').style.display     = 'none';
+    document.getElementById('goal-form-section').style.display = 'none';
     document.getElementById('goal-progress-section').style.display = 'block';
-    document.getElementById('goal-current').textContent            = fmt(current);
-    document.getElementById('goal-target-display').textContent     = fmt(target);
-    document.getElementById('goal-progress-bar').style.width       = `${pct}%`;
+    document.getElementById('goal-current').textContent = fmt(current);
+    document.getElementById('goal-target-display').textContent = fmt(target);
+    document.getElementById('goal-progress-bar').style.width = `${pct}%`;
 
-    const remaining  = Math.max(target - current, 0).toFixed(1);
-    const daysNote   = userType === 'industry' ? ` (${days} days recorded)` : '';
+    const remaining = Math.max(target - current, 0).toFixed(1);
+    const daysNote = userType === 'industry' ? ` (${days} days recorded)` : '';
     document.getElementById('goal-status-text').textContent = current <= target
       ? `On track! ${remaining} kg below target.${daysNote}`
       : `Over target by ${(current - target).toFixed(1)} kg.${daysNote}`;
@@ -459,4 +464,171 @@ async function loadGoal(userType) {
   } catch (err) {
     // No goal set — form shown by default
   }
+}
+
+
+// ============================================================
+// ECO SCORE
+// ============================================================
+
+function computeEcoScore(summaries, current, previous, change) {
+  if (!summaries || summaries.length === 0) {
+    return { score: 0, base: 0, consistency: 0, improvement: 0 };
+  }
+
+  // Base: 40 pts for tracking anything
+  const base = 40;
+
+  // Consistency bonus: up to 20 pts
+  let consistency = 0;
+  if (summaries.length >= 6) consistency = 20;
+  else if (summaries.length >= 3) consistency = 15;
+  else if (summaries.length >= 2) consistency = 10;
+  else consistency = 5;  // first month
+
+  // Improvement bonus: up to 40 pts
+  let improvement = 0;
+  if (previous && change && Object.keys(change).length > 0) {
+    const pct = change.percent; // negative = footprint went DOWN (good)
+    if (pct <= -20) improvement = 40;
+    else if (pct <= -10) improvement = 30;
+    else if (pct < 0) improvement = 15;
+    // pct >= 0 means no improvement — 0 bonus
+  }
+
+  const score = Math.min(100, Math.max(0, base + consistency + improvement));
+  return { score, base, consistency, improvement };
+}
+
+function getScoreLabel(score) {
+  if (score === 0) return { label: 'No data yet — start tracking!', color: '#64748b' };
+  if (score <= 44) return { label: 'Getting started 🌱', color: '#f59e0b' };
+  if (score <= 59) return { label: 'Building habits 📈', color: '#f59e0b' };
+  if (score <= 74) return { label: 'Good progress! ✅', color: '#22c55e' };
+  if (score <= 84) return { label: 'Great work! 🎉', color: '#22c55e' };
+  return { label: 'Eco Champion! 🏆', color: '#4ade80' };
+}
+
+function renderEcoScore(summaries, current, previous, change) {
+  const container = document.getElementById('eco-score-container');
+  if (!container) return;
+
+  const { score, base, consistency, improvement } = computeEcoScore(summaries, current, previous, change);
+  const { label, color } = getScoreLabel(score);
+
+  const radius = 54;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+
+  container.innerHTML = `
+    <div class="eco-score-wrap">
+      <div class="eco-score-gauge">
+        <svg viewBox="0 0 120 120" width="150" height="150">
+          <circle cx="60" cy="60" r="${radius}"
+            fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="${radius}"
+            fill="none" stroke="${color}" stroke-width="10"
+            stroke-linecap="round"
+            stroke-dasharray="${circumference.toFixed(1)}"
+            stroke-dashoffset="${offset.toFixed(1)}"
+            transform="rotate(-90 60 60)"
+            style="transition:stroke-dashoffset 1.2s ease"/>
+          <text x="60" y="56" text-anchor="middle"
+            font-size="26" font-weight="800" fill="${color}" font-family="Inter,sans-serif">
+            ${score}
+          </text>
+          <text x="60" y="72" text-anchor="middle"
+            font-size="10" fill="#64748b" font-family="Inter,sans-serif">/ 100</text>
+        </svg>
+      </div>
+      <div class="eco-score-info">
+        <div class="eco-score-label" style="color:${color};">${label}</div>
+        <div class="eco-score-breakdown">
+          <div class="eco-score-row">
+            <span>Tracking active (base)</span>
+            <span class="eco-score-pts">${base > 0 ? '+' + base : '0'} pts</span>
+          </div>
+          <div class="eco-score-row">
+            <span>Consistency (${summaries.length} month${summaries.length !== 1 ? 's' : ''})</span>
+            <span class="eco-score-pts">+${consistency} pts</span>
+          </div>
+          <div class="eco-score-row">
+            <span>Monthly improvement</span>
+            <span class="eco-score-pts">${improvement > 0 ? '+' + improvement : improvement} pts</span>
+          </div>
+        </div>
+        <p class="eco-score-note">
+          Score is based on your actual tracking history and monthly reduction progress.
+          It updates automatically when you add new calculations.
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+
+// ============================================================
+// ACHIEVEMENT BADGES
+// ============================================================
+
+function computeBadges(summaries, current, previous, change, score) {
+  return [
+    {
+      icon: '🥇',
+      name: 'Eco Starter',
+      desc: 'Complete your first footprint calculation',
+      unlocked: summaries.length >= 1
+    },
+    {
+      icon: '🌱',
+      name: 'Green Progress',
+      desc: 'Reduce your footprint compared to last month',
+      unlocked: !!(change && Object.keys(change).length > 0 && change.percent < 0)
+    },
+    {
+      icon: '📉',
+      name: '10% Reducer',
+      desc: 'Reduce your monthly footprint by at least 10%',
+      unlocked: !!(change && Object.keys(change).length > 0 && change.percent <= -10)
+    },
+    {
+      icon: '📅',
+      name: '3-Month Tracker',
+      desc: 'Track your footprint for 3 or more months',
+      unlocked: summaries.length >= 3
+    },
+    {
+      icon: '🏆',
+      name: 'Carbon Champion',
+      desc: 'Achieve an Eco Score of 80 or higher',
+      unlocked: score >= 80
+    }
+  ];
+}
+
+function renderBadges(summaries, current, previous, change) {
+  const container = document.getElementById('achievements-container');
+  if (!container) return;
+
+  const { score } = computeEcoScore(summaries, current, previous, change);
+  const badges = computeBadges(summaries, current, previous, change, score);
+  const unlocked = badges.filter(b => b.unlocked).length;
+
+  container.innerHTML = `
+    <div class="badges-summary">
+      <span class="badges-count">${unlocked} / ${badges.length}</span> badges unlocked
+    </div>
+    <div class="badges-grid">
+      ${badges.map(b => `
+        <div class="badge-card ${b.unlocked ? 'badge-unlocked' : 'badge-locked'}">
+          <div class="badge-icon">${b.icon}</div>
+          <div class="badge-body">
+            <div class="badge-name">${b.name}</div>
+            <div class="badge-desc">${b.desc}</div>
+          </div>
+          <div class="badge-status">${b.unlocked ? '✓ Unlocked' : '🔒 Locked'}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
