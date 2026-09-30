@@ -79,6 +79,38 @@ https://eco-track-6tck.onrender.com
 - Raw records CSV (daily for Industry, monthly for Individual)
 - Monthly aggregated summary CSV (for both modes)
 
+### 🌱 Eco Score (0–100)
+- Deterministic score computed from real tracking data — no manual input needed
+- Circular SVG gauge with animated fill displayed on the Dashboard
+- Scoring formula:
+  - **40 pts** base — for having any footprint data
+  - **Up to 20 pts** consistency bonus — based on months of tracking history
+  - **Up to 40 pts** improvement bonus — based on % reduction vs previous month
+- Score label changes with progress: *Getting Started → Building Habits → Good Progress → Eco Champion*
+- Updates automatically when new calculations are submitted
+
+### 🏆 Achievement Badges
+- 5 badges that unlock automatically based on real tracking history
+
+| Badge | Unlock Condition |
+|---|---|
+| 🥇 Eco Starter | Complete your first footprint calculation |
+| 🌱 Green Progress | Reduce footprint vs previous month |
+| 📉 10% Reducer | Achieve ≥10% month-over-month reduction |
+| 📅 3-Month Tracker | Track for 3 or more months |
+| 🏆 Carbon Champion | Achieve an Eco Score of 80 or higher |
+
+- Locked badges are visually dimmed; unlocked badges glow green
+- Displayed alongside Eco Score on the Dashboard
+
+### 🔍 Emission Factor Explorer
+- Dedicated page (`/emission-factors`) explaining the carbon calculation methodology
+- Accordion-style expandable cards for each emission category
+- Shows the **exact same factors used by the calculator** — single source of truth from `utils/calculator.py`
+- Displays: factor value, unit, reference source, calculation formula, and a worked example
+- Transport section includes a full table of all 9 vehicle modes
+- Methodology statement explaining that results are estimates, not measurements
+
 ### 📱 Mobile Responsive
 - Hamburger navigation menu on phones and tablets
 - Responsive form layout and stat grids
@@ -152,8 +184,9 @@ ECOTRACK/
 ├── templates/
 │   ├── index.html              # Homepage
 │   ├── calculator.html         # Dual-mode calculator
-│   ├── dashboard.html          # Dashboard + charts
-│   └── history.html            # History + export
+│   ├── dashboard.html          # Dashboard + charts + Eco Score + Badges
+│   ├── history.html            # History + export
+│   └── factors.html            # Emission Factor Explorer
 │
 ├── static/
 │   ├── css/style.css           # Global design system (dark mode, glassmorphism)
@@ -282,7 +315,17 @@ The `render.yaml` in the repository root contains the complete deployment config
 | `GET` | `/api/report?user_type=` | Export raw records as CSV |
 | `GET` | `/api/report/monthly?user_type=` | Export monthly summary as CSV |
 
-All endpoints accept `?user_type=individual` or `?user_type=industry`.
+All API endpoints accept `?user_type=individual` or `?user_type=industry`.
+
+### Page Routes
+
+| Method | Route | Description |
+|---|---|---|
+| `GET` | `/` | Homepage |
+| `GET` | `/calculator` | Carbon calculator |
+| `GET` | `/dashboard` | Dashboard with Eco Score + Badges |
+| `GET` | `/history` | History and CSV export |
+| `GET` | `/emission-factors` | Emission Factor Explorer |
 
 ---
 
