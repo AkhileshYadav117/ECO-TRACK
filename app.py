@@ -25,7 +25,10 @@ from flask import Flask, request, jsonify, render_template, Response
 sys.path.insert(0, os.path.dirname(__file__))
 
 from database.init_db      import init_db, get_connection
-from utils.calculator      import calculate, calculate_daily_total
+from utils.calculator      import (calculate, calculate_daily_total,
+                                   TRANSPORT_FACTORS, ELECTRICITY_FACTOR,
+                                   LPG_FACTOR, WASTE_FACTOR)
+
 from utils.validation      import validate_calculator_input
 from utils.data_quality    import assess_data_quality
 from utils.recommendations import get_recommendations
@@ -58,6 +61,28 @@ def calculator():
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+
+@app.route('/emission-factors')
+def emission_factors_page():
+    """Emission Factor Explorer — displays the factors used by the calculator."""
+    transport_data = [
+        {"mode": "Petrol Car",        "factor": TRANSPORT_FACTORS["petrol_car"],    "source": "DEFRA 2023"},
+        {"mode": "Diesel Car / Truck","factor": TRANSPORT_FACTORS["diesel_car"],    "source": "DEFRA 2023"},
+        {"mode": "Motorcycle",        "factor": TRANSPORT_FACTORS["motorcycle"],    "source": "DEFRA 2023"},
+        {"mode": "Bus",               "factor": TRANSPORT_FACTORS["bus"],           "source": "IPCC AR6"},
+        {"mode": "Auto Rickshaw",     "factor": TRANSPORT_FACTORS["auto_rickshaw"], "source": "MoEFCC India"},
+        {"mode": "Metro / Rail",      "factor": TRANSPORT_FACTORS["metro_rail"],    "source": "CEA India"},
+        {"mode": "Electric Car",      "factor": TRANSPORT_FACTORS["electric_car"],  "source": "CEA India 2023"},
+        {"mode": "Bicycle",           "factor": TRANSPORT_FACTORS["bicycle"],       "source": "Zero emission"},
+        {"mode": "Walking",           "factor": TRANSPORT_FACTORS["walking"],       "source": "Zero emission"},
+    ]
+    return render_template('factors.html',
+        transport_factors   = transport_data,
+        electricity_factor  = ELECTRICITY_FACTOR,
+        lpg_factor          = LPG_FACTOR,
+        waste_factor        = WASTE_FACTOR
+    )
+
 
 @app.route('/history')
 def history():
