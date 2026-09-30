@@ -350,12 +350,3 @@ All API endpoints accept `?user_type=individual` or `?user_type=industry`.
 
 ---
 
-## 👤 Author
-
-**Akhilesh Yadav**
-Environmental Science for Engineers — Software Project
-GitHub: [AkhileshYadav117](https://github.com/AkhileshYadav117)
-
----
-
-*EcoTrack — Because every kilogram of CO₂e counts. 🌍*
