@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emission Factors — EcoTrack</title>
+  <meta name="description"
+    content="Understand the emission factors EcoTrack uses to convert activity data into estimated CO₂e emissions." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="navbar-brand" href="/"><div class="brand-icon">🌿</div>Eco<span>Track</span></a>
+    <ul class="navbar-links">
+      <li><a href="/">🏠 Home</a></li>
+      <li><a href="/calculator">🧮 Calculator</a></li>
+      <li><a href="/dashboard">📊 Dashboard</a></li>
+      <li><a href="/history">📋 History</a></li>
+      <li><a href="/emission-factors" class="active">🔍 Factors</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <h1>🔍 Emission Factor Explorer</h1>
+      <p>Understand how EcoTrack converts your activity data into estimated carbon emissions.</p>
+    </div>
+
+    <!-- METHODOLOGY STATEMENT -->
+    <div class="card ef-methodology">
+      <div class="card-title"><span class="icon">📐</span> Calculation Methodology</div>
+      <div class="ef-formula-box">
+        <span class="ef-formula-term">Activity</span>
+        <span class="ef-formula-op">×</span>
+        <span class="ef-formula-term">Emission Factor</span>
+        <span class="ef-formula-op">=</span>
+        <span class="ef-formula-result">Estimated CO₂e</span>
+      </div>
+      <p class="ef-method-note">
+        EcoTrack estimates carbon emissions by multiplying user-reported activity quantities by
+        documented emission factors. Results are <strong>estimates</strong> — not direct physical
+        measurements of greenhouse gas emissions. Actual emissions may vary based on geography,
+        technology, and local energy mix.
+      </p>
+      <div class="ef-source-note">
+        Sources used in this project: DEFRA 2023 &nbsp;·&nbsp; IPCC AR6 &nbsp;·&nbsp; CEA India 2023 &nbsp;·&nbsp; MoEFCC India
+      </div>
+    </div>
+
+    <!-- ELECTRICITY -->
+    <div class="card ef-card">
+      <button class="ef-toggle" onclick="toggleEF('electricity')" id="btn-electricity">
+        <span class="ef-toggle-icon">⚡</span>
+        <span class="ef-toggle-title">Electricity</span>
+        <span class="ef-toggle-factor">{{ electricity_factor }} kg CO₂e / kWh</span>
+        <span class="ef-toggle-arrow" id="arrow-electricity">▼</span>
+      </button>
+      <div class="ef-body" id="ef-electricity">
+        <div class="ef-grid">
+          <div class="ef-item">
+            <div class="ef-label">Emission Factor</div>
+            <div class="ef-value">{{ electricity_factor }} kg CO₂e / kWh</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Unit</div>
+            <div class="ef-value">kg CO₂e per kWh consumed</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Reference</div>
+            <div class="ef-value">CEA India 2023 — India Grid Emission Factor</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Calculation Formula</div>
+            <div class="ef-value">Electricity (kWh) × {{ electricity_factor }} = kg CO₂e</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Example</div>
+            <div class="ef-value">100 kWh × {{ electricity_factor }} = {{ "%.1f"|format(100 * electricity_factor) }} kg CO₂e</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Scope</div>
+            <div class="ef-value">India national average grid emission intensity (2022–23 baseline)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSPORT -->
+    <div class="card ef-card">
+      <button class="ef-toggle" onclick="toggleEF('transport')" id="btn-transport">
+        <span class="ef-toggle-icon">🚗</span>
+        <span class="ef-toggle-title">Transportation</span>
+        <span class="ef-toggle-factor">0.0 – 0.21 kg CO₂e / km (varies by mode)</span>
+        <span class="ef-toggle-arrow" id="arrow-transport">▼</span>
+      </button>
+      <div class="ef-body" id="ef-transport">
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin:0.75rem 0 1rem;">
+          EcoTrack uses mode-specific emission factors for transportation.
+          Each factor represents kg of CO₂e emitted per km travelled.
+        </p>
+        <div class="ef-table-wrap">
+          <table class="ef-table">
+            <thead>
+              <tr>
+                <th>Transport Mode</th>
+                <th>Factor (kg CO₂e / km)</th>
+                <th>Reference</th>
+                <th>Example: 100 km</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in transport_factors %}
+              <tr {% if t.factor == 0 %}class="ef-zero-row"{% endif %}>
+                <td>{{ t.mode }}</td>
+                <td>
+                  {% if t.factor == 0 %}
+                    <span style="color:var(--accent);">0.000</span>
+                  {% else %}
+                    {{ "%.3f"|format(t.factor) }}
+                  {% endif %}
+                </td>
+                <td>{{ t.source }}</td>
+                <td>
+                  {% if t.factor == 0 %}
+                    <span style="color:var(--accent);">0.0 kg CO₂e</span>
+                  {% else %}
+                    {{ "%.1f"|format(100 * t.factor) }} kg CO₂e
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="ef-method-note" style="margin-top:1rem;">
+          Formula: Distance (km) × Mode Factor = kg CO₂e
+        </div>
+      </div>
+    </div>
+
+    <!-- FUEL / LPG -->
+    <div class="card ef-card">
+      <button class="ef-toggle" onclick="toggleEF('fuel')" id="btn-fuel">
+        <span class="ef-toggle-icon">🔥</span>
+        <span class="ef-toggle-title">Fuel / LPG</span>
+        <span class="ef-toggle-factor">{{ lpg_factor }} kg CO₂e / cylinder</span>
+        <span class="ef-toggle-arrow" id="arrow-fuel">▼</span>
+      </button>
+      <div class="ef-body" id="ef-fuel">
+        <div class="ef-grid">
+          <div class="ef-item">
+            <div class="ef-label">Emission Factor</div>
+            <div class="ef-value">{{ lpg_factor }} kg CO₂e per cylinder</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Unit</div>
+            <div class="ef-value">kg CO₂e per standard 14.2 kg LPG cylinder</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Reference</div>
+            <div class="ef-value">IPCC AR6 — Liquefied Petroleum Gas combustion</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Calculation Formula</div>
+            <div class="ef-value">LPG Cylinders × {{ lpg_factor }} = kg CO₂e</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Example</div>
+            <div class="ef-value">2 cylinders × {{ lpg_factor }} = {{ "%.1f"|format(2 * lpg_factor) }} kg CO₂e</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Scope</div>
+            <div class="ef-value">Standard domestic 14.2 kg LPG cylinder (cooking / heating fuel)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WASTE -->
+    <div class="card ef-card">
+      <button class="ef-toggle" onclick="toggleEF('waste')" id="btn-waste">
+        <span class="ef-toggle-icon">♻️</span>
+        <span class="ef-toggle-title">Waste</span>
+        <span class="ef-toggle-factor">{{ waste_factor }} kg CO₂e / kg waste</span>
+        <span class="ef-toggle-arrow" id="arrow-waste">▼</span>
+      </button>
+      <div class="ef-body" id="ef-waste">
+        <div class="ef-grid">
+          <div class="ef-item">
+            <div class="ef-label">Emission Factor</div>
+            <div class="ef-value">{{ waste_factor }} kg CO₂e per kg of waste</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Unit</div>
+            <div class="ef-value">kg CO₂e per kg mixed municipal solid waste</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Reference</div>
+            <div class="ef-value">DEFRA 2023 — Mixed municipal waste disposal</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Calculation Formula</div>
+            <div class="ef-value">Waste (kg) × {{ waste_factor }} = kg CO₂e</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Example</div>
+            <div class="ef-value">50 kg × {{ waste_factor }} = {{ "%.1f"|format(50 * waste_factor) }} kg CO₂e</div>
+          </div>
+          <div class="ef-item">
+            <div class="ef-label">Scope</div>
+            <div class="ef-value">Mixed solid waste — landfill and incineration average</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="card" style="background:rgba(255,255,255,0.02); border-style:dashed;">
+      <p style="font-size:0.82rem; color:var(--text-muted); line-height:1.7; margin:0;">
+        ⚠️ <strong style="color:var(--text-secondary);">Disclaimer:</strong>
+        All emission factors shown here are the exact values used by EcoTrack's carbon calculator —
+        no separate copies are maintained.
+        These factors are drawn from published national and international emission inventories.
+        All results are <strong style="color:var(--text-secondary);">estimates</strong>.
+        EcoTrack does not directly measure physical CO₂ emissions.
+        Actual values depend on local conditions, equipment efficiency, fuel quality, and energy mix.
+      </p>
+    </div>
+
+  </div><!-- end page-container -->
+
+  <script src="/static/js/main.js"></script>
+  <script>
+    function toggleEF(id) {
+      const body  = document.getElementById('ef-' + id);
+      const arrow = document.getElementById('arrow-' + id);
+      const open  = body.classList.toggle('ef-body-open');
+      arrow.textContent = open ? '▲' : '▼';
+    }
+    // Open Electricity card by default on page load
+    document.addEventListener('DOMContentLoaded', () => toggleEF('electricity'));
+  </script>
+</body>
+</html>
