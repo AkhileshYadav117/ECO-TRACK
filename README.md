@@ -3,9 +3,7 @@
 > **Environmental Science for Engineers (ESE) — Software Project**
 > Estimate, monitor, and reduce your carbon footprint with AI-powered insights.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46e891?style=for-the-badge&logo=render)](https://eco-track-6tck.onrender.com)
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)](https://python.org)
-[![Flask](https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com)
+<p align="center"> <a href="https://eco-track-6tck.onrender.com"> <img src="https://img.shields.io/badge/Live%20Demo-Render-46e891?style=for-the-badge&logo=render" alt="Live Demo"> </a> <a href="https://python.org"> <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python" alt="Python"> </a> <a href="https://flask.palletsprojects.com"> <img src="https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask" alt="Flask"> </a> </p>
 
 ---
 
