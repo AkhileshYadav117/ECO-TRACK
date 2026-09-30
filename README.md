@@ -4,7 +4,6 @@
 > Estimate, monitor, and reduce your carbon footprint with AI-powered insights.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46e891?style=for-the-badge&logo=render)](https://eco-track-6tck.onrender.com)
-[![GitHub](https://img.shields.io/badge/GitHub-AkhileshYadav117-181717?style=for-the-badge&logo=github)](https://github.com/AkhileshYadav117/ECO-TRACK)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com)
 
