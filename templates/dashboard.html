@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,6 +21,7 @@
       width: fit-content;
       margin-bottom: 1.5rem;
     }
+
     .mode-toggle-btn {
       padding: 0.45rem 1.1rem;
       border-radius: 0.5rem;
@@ -31,23 +33,31 @@
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
     }
+
     .mode-toggle-btn.active {
       background: var(--accent);
       color: #000;
     }
+
     /* Industry-only sections hidden by default */
-    .industry-only { display: none; }
+    .industry-only {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
 
   <nav class="navbar">
-    <a class="navbar-brand" href="/"><div class="brand-icon">🌿</div>Eco<span>Track</span></a>
+    <a class="navbar-brand" href="/">
+      <div class="brand-icon">🌿</div>Eco<span>Track</span>
+    </a>
     <ul class="navbar-links">
       <li><a href="/">🏠 Home</a></li>
       <li><a href="/calculator">🧮 Calculator</a></li>
       <li><a href="/dashboard" class="active">📊 Dashboard</a></li>
       <li><a href="/history">📋 History</a></li>
+      <li><a href="/emission-factors">🔍 Factors</a></li>
     </ul>
   </nav>
 
@@ -62,10 +72,9 @@
 
     <!-- MODE TOGGLE -->
     <div class="mode-toggle">
-      <button class="mode-toggle-btn" id="dash-btn-individual"
-              onclick="switchDashMode('individual')">🏠 Individual</button>
-      <button class="mode-toggle-btn" id="dash-btn-industry"
-              onclick="switchDashMode('industry')">🏭 Industry</button>
+      <button class="mode-toggle-btn" id="dash-btn-individual" onclick="switchDashMode('individual')">🏠
+        Individual</button>
+      <button class="mode-toggle-btn" id="dash-btn-industry" onclick="switchDashMode('industry')">🏭 Industry</button>
     </div>
 
     <!-- STAT CARDS -->
@@ -187,8 +196,7 @@
             <div class="progress-bar-container">
               <div class="progress-bar-fill" id="goal-progress-bar" style="width:0%"></div>
             </div>
-            <p id="goal-status-text"
-               style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.5rem;"></p>
+            <p id="goal-status-text" style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.5rem;"></p>
           </div>
 
         </div>
@@ -200,7 +208,8 @@
     <div class="card" style="margin-bottom:1rem;">
       <div class="card-title"><span class="icon">🔬</span> What-If Carbon Reduction Simulator</div>
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.25rem;">
-        Simulate how activity changes would affect your footprint. Results are estimates using the same emission factors.
+        Simulate how activity changes would affect your footprint. Results are estimates using the same emission
+        factors.
       </p>
 
       <div class="form-grid">
@@ -245,18 +254,15 @@
            border-radius:var(--radius-md);">
         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; text-align:center;">
           <div>
-            <div style="font-size:1.6rem; font-weight:800; color:var(--text-secondary);"
-                 id="sim-original">—</div>
+            <div style="font-size:1.6rem; font-weight:800; color:var(--text-secondary);" id="sim-original">—</div>
             <div style="font-size:0.75rem; color:var(--text-muted);">Current Footprint</div>
           </div>
           <div>
-            <div style="font-size:1.6rem; font-weight:800; color:var(--accent-light);"
-                 id="sim-projected">—</div>
+            <div style="font-size:1.6rem; font-weight:800; color:var(--accent-light);" id="sim-projected">—</div>
             <div style="font-size:0.75rem; color:var(--text-muted);">Projected Footprint</div>
           </div>
           <div>
-            <div style="font-size:1.6rem; font-weight:800; color:#4ade80;"
-                 id="sim-saving">—</div>
+            <div style="font-size:1.6rem; font-weight:800; color:#4ade80;" id="sim-saving">—</div>
             <div style="font-size:0.75rem; color:var(--text-muted);">Potential Saving</div>
           </div>
         </div>
@@ -278,10 +284,37 @@
       </div>
     </div>
 
+
+    <!-- ECO SCORE CARD -->
+    <div class="card" id="eco-score-card">
+      <div class="card-title"><span class="icon">🌱</span> Eco Score</div>
+      <div id="eco-score-container">
+        <div class="empty-state">
+          <div class="empty-icon">🌱</div>
+          <h3>Loading score...</h3>
+          <p>Calculate your footprint to see your Eco Score.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS CARD -->
+    <div class="card" id="achievements-card">
+      <div class="card-title"><span class="icon">🏆</span> Achievements</div>
+      <div id="achievements-container">
+        <div class="empty-state">
+          <div class="empty-icon">🏆</div>
+          <h3>Loading badges...</h3>
+          <p>Complete calculations to unlock achievement badges.</p>
+        </div>
+      </div>
+    </div>
+
+
   </div><!-- end page-container -->
 
   <script src="/static/js/main.js"></script>
   <script src="/static/js/dashboard.js"></script>
   <script src="/static/js/simulator.js"></script>
 </body>
+
 </html>
